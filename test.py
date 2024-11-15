@@ -97,12 +97,21 @@ class Game:
         """Change la valeur des pions entre (x1; y1) et (x2; y2) de par les règles de l'Othello 
         """
         #faut faire avec des vecteurs mais 😴
+
+        dx = int(coo_x2 - coo_x1) / abs((coo_x2 - coo_x1)) if (coo_x2 - coo_x1)!=0 else 0
+        dy = int(coo_y2 - coo_y1) / abs((coo_y2 - coo_y1)) if (coo_y2 - coo_y1)!=0 else 0
+        
+        print(f"{dx=}; {dy=}")
+
         print(f"pion initial : ({coo_x1}; {coo_y1})")
         print(f"pion   final : ({coo_x2}; {coo_y2})")
-        for x in range(coo_x1,coo_x2+1):
-            print("waza")
-            for y in range(coo_y1, coo_y2+1):
-                self.actual_game[x][y] = couleur
+        
+        point_a_atteindre = (coo_x2, coo_y2)
+        nouveau_point = (coo_x1, coo_y1)
+
+        while nouveau_point != point_a_atteindre:
+            self.actual_game[nouveau_point[0]][nouveau_point[1]] = couleur
+            nouveau_point = (int(nouveau_point[0]+dx), int(nouveau_point[1]+dy))
                 
 
     def analyser_direction(self, x: int, y: int, couleur : int, couleur_autre: int, dx: int, dy: int) -> tuple[int,int]:
@@ -128,6 +137,7 @@ class Game:
 
     def entre_pions(self, x: int, y: int, couleur : int, coul_ennemy : int):
         print(f"coo pion = ({x};{y}), couleur : {self.actual_game[x][y]}")
+
         for dx in range(-1,2):
             for dy in range(-1,2):
 
