@@ -1,5 +1,16 @@
-import pyxel
+#import pyxel
 import re
+
+
+class Pion:
+    # Un Pion a une couleur, des coordonees
+    def __init__(self, couleur : int, x :int, y: int):
+        self.couleur = couleur
+        self.x = x
+        self.y = y
+
+
+
 
 class Game:
     def __init__(self) -> None:
@@ -38,7 +49,7 @@ class Game:
         ligne = ""
         for i in self.actual_game:
             for j in i:
-                ligne += str(j)
+                ligne += str(j) + " "
             print(ligne)
             ligne = ""
 
@@ -81,8 +92,43 @@ class Game:
                                     print(moves_possible)
         return moves_possible
     
-    def flippeur(self):
-        ...
+
+    def colorier_entre(self, coo_x1 : int, coo_y1 :int, coo_x2 : int, coo_y2 : int, couleur : int):
+        for x in range(coo_x1,coo_x2):
+            for y in range(coo_y1, coo_y2):
+                self.actual_game[x][y] = couleur
+
+    def analyser_direction(self, x: int, y: int, couleur : int, couleur_autre: int, dx: int, dy: int) -> tuple[int,int]:
+
+        if self.actual_game[x][y] == couleur:
+            return (x, y)
+        elif self.actual_game[x][y] == 0:
+            return None
+        else: 
+            self.analyser_direction(x+dx, y+dy, couleur, couleur_autre, dx, dy)
+
+    def entre_pions(self, x: int, y: int, couleur : int, coul_ennemy : int):
+        print(f"coo pion = ({x};{y}), {self.actual_game[x][y]}")
+        for dx in range(-1,2):
+            for dy in range(-1,2):
+
+                pion_a_cote = self.actual_game[x+dx][y+dy]
+                print(f"vecteur : ({dx=}; {dy=}), pion à coté : ({x+dx}; {y+dy}), pion {coul_ennemy} ? : {self.actual_game[x+dx][y+dy] == coul_ennemy}")
+
+                if pion_a_cote == coul_ennemy:
+                    dernier = self.analyser_direction(x, y, couleur, coul_ennemy, dx, dy)
+                    print(f"{dernier=}")
+                    if dernier is not None:
+                        print("waza")
+                        self.colorier_entre(x,y,dernier[0],dernier[1],couleur)
+  
+    #def flippeur_pion(self):
+    #    
+    #    for i in range(len(self.actual_game)):
+    #        for j in range(len(self.actual_game[i])):
+    #            if self.actual_game[i][j] != 0:
+    #                self.entre_pions(i, j, self.actual_game[i][j])
+
 
     def start(self):
         # Boucle principale du jeu
@@ -113,6 +159,7 @@ class Game:
                 elif self.turn == "White":
                     self.actual_game[self.coup[coup[0]]][int(coup[1]) - 1] = 1
                     self.turn = "Black"
+                self.entre_pions(self.coup[coup[0]], int(coup[1]) - 1, couleur_joueur, couleur_adversaire)
             else:
                 print("Position Non Valide !")
         else:
