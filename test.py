@@ -96,6 +96,7 @@ class Game:
     def colorier_entre(self, coo_x1 : int, coo_y1 :int, coo_x2 : int, coo_y2 : int, couleur : int):
         """Change la valeur des pions entre (x1; y1) et (x2; y2) de par les règles de l'Othello 
         """
+        #faut faire avec des vecteurs mais 😴
         print(f"pion initial : ({coo_x1}; {coo_y1})")
         print(f"pion   final : ({coo_x2}; {coo_y2})")
         for x in range(coo_x1,coo_x2+1):
