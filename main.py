@@ -81,8 +81,24 @@ class Game:
                                     print(moves_possible)
         return moves_possible
     
-    def flippeur(self):
-        ...
+    def colorier_entre(self, coo_x1 : int, coo_y1 :int, coo_x2 : int, coo_y2 : int, couleur : int):
+        for x in range(coo_x1,coo_x2):
+            for y in range(coo_y1, coo_y2):
+                self.actual_game[x][y] = couleur
+
+    def entre_pions(self, i, j) -> tuple[int,int]:
+        for dx in range(-1,1):
+            for dy in range(-1,1):
+                if self.actual_game[dx][dy] != 0:
+                    self.entre_pions(dx,dy)
+                    return (i+dx,j+dy)
+        return (0,0)
+        
+    def flippeur_pion(self):
+        for i in range(len(self.actual_game)):
+            for j in range(len(self.actual_game[i])):
+                if self.actual_game[i][j] != 0:
+                    self.entre_pions(i, j)
 
     def start(self):
         # Boucle principale du jeu
