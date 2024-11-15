@@ -94,21 +94,39 @@ class Game:
     
 
     def colorier_entre(self, coo_x1 : int, coo_y1 :int, coo_x2 : int, coo_y2 : int, couleur : int):
-        for x in range(coo_x1,coo_x2):
-            for y in range(coo_y1, coo_y2):
+        """Change la valeur des pions entre (x1; y1) et (x2; y2) de par les règles de l'Othello 
+        """
+        print(f"pion initial : ({coo_x1}; {coo_y1})")
+        print(f"pion   final : ({coo_x2}; {coo_y2})")
+        for x in range(coo_x1,coo_x2+1):
+            print("waza")
+            for y in range(coo_y1, coo_y2+1):
                 self.actual_game[x][y] = couleur
+                
 
     def analyser_direction(self, x: int, y: int, couleur : int, couleur_autre: int, dx: int, dy: int) -> tuple[int,int]:
+        """Fonction récursive : 
+        Retourne les coordonnées du prochain pion de la même couleur que celui entré en paramètre si il existe
 
-        if self.actual_game[x][y] == couleur:
-            return (x, y)
-        elif self.actual_game[x][y] == 0:
+        Args:
+            x (int): coordonnées x d'un pion
+            y (int): coordonnées y d'un pion
+            couleur (int): couleur du pion dont on à les coordonnées
+            couleur_autre (int): couleur opposée au pion dont on à les coordonnées
+            dx (int): coordonées en x du vecteur direction
+            dy (int): coordonées en y du vecteur direction
+
+        Returns:
+            tuple[int,int]: coordonnées du prochain pion de couleur adptée
+        """
+        if self.actual_game[x+dx][y+dy] == couleur:
+            return (x+dx, y+dy)
+        elif self.actual_game[x+dx][y+dy] == 0:
             return None
-        else: 
-            self.analyser_direction(x+dx, y+dy, couleur, couleur_autre, dx, dy)
+        return self.analyser_direction(x+dx, y+dy, couleur, couleur_autre, dx, dy)
 
     def entre_pions(self, x: int, y: int, couleur : int, coul_ennemy : int):
-        print(f"coo pion = ({x};{y}), {self.actual_game[x][y]}")
+        print(f"coo pion = ({x};{y}), couleur : {self.actual_game[x][y]}")
         for dx in range(-1,2):
             for dy in range(-1,2):
 
@@ -119,7 +137,7 @@ class Game:
                     dernier = self.analyser_direction(x, y, couleur, coul_ennemy, dx, dy)
                     print(f"{dernier=}")
                     if dernier is not None:
-                        print("waza")
+                        
                         self.colorier_entre(x,y,dernier[0],dernier[1],couleur)
   
     #def flippeur_pion(self):
