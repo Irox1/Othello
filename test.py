@@ -46,10 +46,13 @@ class Game:
 
     def afficher_le_jeu(self):
         # Affiche la grille de jeu actuelle en console
+        en_joli = {0: "🔸", 1: "⚪", 2: "⚫"}
+        print("  1  2  3  4  5  6  7  8  ")
         ligne = ""
-        for i in self.actual_game:
-            for j in i:
-                ligne += str(j) + " "
+        for i in range(len(self.actual_game)):
+            ligne += self.coup_inverse[i]
+            for j in self.actual_game[i]:
+                ligne += en_joli[j] + " "
             print(ligne)
             ligne = ""
 
@@ -101,10 +104,10 @@ class Game:
         dx = int(coo_x2 - coo_x1) / abs((coo_x2 - coo_x1)) if (coo_x2 - coo_x1)!=0 else 0
         dy = int(coo_y2 - coo_y1) / abs((coo_y2 - coo_y1)) if (coo_y2 - coo_y1)!=0 else 0
         
-        print(f"{dx=}; {dy=}")
+        #print(f"{dx=}; {dy=}")
 
-        print(f"pion initial : ({coo_x1}; {coo_y1})")
-        print(f"pion   final : ({coo_x2}; {coo_y2})")
+        #print(f"pion initial : ({coo_x1}; {coo_y1})")
+        #print(f"pion   final : ({coo_x2}; {coo_y2})")
         
         point_a_atteindre = (coo_x2, coo_y2)
         nouveau_point = (coo_x1, coo_y1)
@@ -136,13 +139,13 @@ class Game:
         return self.analyser_direction(x+dx, y+dy, couleur, couleur_autre, dx, dy)
 
     def entre_pions(self, x: int, y: int, couleur : int, coul_ennemy : int):
-        print(f"coo pion = ({x};{y}), couleur : {self.actual_game[x][y]}")
+        #print(f"coo pion = ({x};{y}), couleur : {self.actual_game[x][y]}")
 
         for dx in range(-1,2):
             for dy in range(-1,2):
 
                 pion_a_cote = self.actual_game[x+dx][y+dy]
-                print(f"vecteur : ({dx=}; {dy=}), pion à coté : ({x+dx}; {y+dy}), pion {coul_ennemy} ? : {self.actual_game[x+dx][y+dy] == coul_ennemy}")
+                #print(f"vecteur : ({dx=}; {dy=}), pion à coté : ({x+dx}; {y+dy}), pion {coul_ennemy} ? : {self.actual_game[x+dx][y+dy] == coul_ennemy}")
 
                 if pion_a_cote == coul_ennemy:
                     dernier = self.analyser_direction(x, y, couleur, coul_ennemy, dx, dy)
