@@ -86,44 +86,51 @@ class Game:
             if valeur_pour_chaque_coup == valeur:
                 return coup
 
-    def coup_disponible(self) -> list[str]:
-        # Renvoie une liste des coups possibles pour le joueur actuel
-        moves_possible = []
+    def coup_disponible(self, joueur: int, position : list[list[int]])->list[str]:
+
+        coups_possibles = []
         
-        # Détermine la couleur du joueur et de l'ennemi
-        couleur_joueur = 2 if self.turn == "Black" else 1
-        couleur_ennemi = 1 if self.turn == "Black" else 2
+        couleur_ennemi = 1 if joueur == 2 else 2
 
-        # Parcours de la grille pour trouver des pions du joueur
-        for i in range(8):
-            for j in range(8):
-                if self.actual_game[i][j] == couleur_joueur:
+        for x in range(8):
+            for y in range(8):
 
-                    # Vérification dans toutes les directions
-                    for k in range(-1, 2):
-                        for n in range(-1, 2): 
-                            if k == 0 and n == 0:
-                                continue
+                if joueur==position[x][y]:
 
-                            # Ceci représente les cases possibles avec leur absices étant x et y leur ordonnée
-                            x = i +k
-                            y = j + n
-                            
-                            if 0 <=x< 8 and 0 <=y< 8 and self.actual_game[x][y] == couleur_ennemi: # SI  x est compris entre 0 et 8 ET y est compris entre 0 et 8 et (t) case autour des cases alliés est enemie :
-                                while 0 <=x<8 and 0 <=y<8: # Tant que x et y sont entre 0 et 8 :
-                                    x += k
-                                    y += n
-                                    if not 0 <=x<8 and 0<=y<8: # Si il n'est pas compris dans le tableau:
-                                        break
-                                    if self.actual_game[x][y] == 0:
-                                        coup_possible = str(self.coup_inverse[y]) + str(x + 1) 
-                                        if coup_possible not in moves_possible:
-                                            moves_possible.append(coup_possible)
-                                        break
-                                    if self.actual_game[x][y] == couleur_joueur:
-                                        break
-                                    print(moves_possible)
-        return moves_possible
+                    for dx in range(-1,2):
+                        for dy in range(-1,2):
+                            pion_possible = position[x+dx][y+dy]
+                            if pion_possible == couleur_ennemi:
+                                coordonnees = self.analyser_direction_pour_coups_possibles(x+dx,y+dy,couleur_ennemi,joueur,dx,dy,position)
+                                if coordonnees is not None:
+                                    en_str = self.coup_inverse[coordonnees[0]] + str(coordonnees[1])
+                                    coups_possibles.append(en_str)
+
+        return coups_possibles
+
+    def analyser_direction_pour_coups_possibles(self, x: int, y: int, couleur : int, couleur_autre: int, dx: int, dy: int, position) -> tuple[int,int]:
+        """Fonction récursive : 
+        Retourne les coordonnées du prochain pion de la même couleur que celui entré en paramètre si il existe
+
+        Args:
+            x (int): coordonnées x d'un pion
+            y (int): coordonnées y d'un pion
+            couleur (int): couleur du pion dont on à les coordonnées
+            couleur_autre (int): couleur opposée au pion dont on à les coordonnées
+            dx (int): coordonées en x du vecteur direction
+            dy (int): coordonées en y du vecteur direction
+
+        Returns:
+            tuple[int,int]: coordonnées du prochain pion de couleur adptée
+        """
+        print(x+dx, y+dy)
+        if position[x+dx][y+dy] == 0:
+            return (x+dx, y+dy)
+        elif position[x+dx][y+dy] == couleur:
+            return None
+        return self.analyser_direction_pour_coups_possibles(x+dx, y+dy, couleur, couleur_autre, dx, dy, position)
+
+
     
     def compter_pions(self, position) -> tuple[int,int]:
         """
@@ -156,7 +163,6 @@ class Game:
             position[nouveau_point[0]][nouveau_point[1]] = couleur
             nouveau_point = (int(nouveau_point[0]+dx), int(nouveau_point[1]+dy))
                 
-
     def analyser_direction(self, x: int, y: int, couleur : int, couleur_autre: int, dx: int, dy: int, position) -> tuple[int,int]:
         """Fonction récursive : 
         Retourne les coordonnées du prochain pion de la même couleur que celui entré en paramètre si il existe
@@ -199,8 +205,9 @@ class Game:
     def start(self):
         #S'occupe des évenements utilisateur
         while self.running:
-            self.afficher_le_jeu(self.actual_game) 
-            coups_possible = self.coup_disponible()
+            couleur_joueur = 2 if self.turn == "Black" else 1
+            self.afficher_le_jeu(self.actual_game)
+            coups_possible = self.coup_disponible(couleur_joueur, self.actual_game)
             if len(coups_possible) == 0:
                 self.game_over = True
             print(f"C'est au tour du joueur : {self.turn}")
@@ -215,7 +222,7 @@ class Game:
         ##Joue un coup donné sur un tableau de jeu donnée
         couleur_joueur = 2 if self.turn == "Black" else 1
         couleur_adversaire = 1 if self.turn == "Black" else 2
-        coups_possibles = self.coup_disponible()
+        coups_possibles = self.coup_disponible(couleur_joueur, self.actual_game)
 
         if bool(re.match(self.regex_coup_othello, move)):
             coup = [move[0], move[1]]
