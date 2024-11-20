@@ -59,7 +59,7 @@ class Game:
         
         if maximizingPlayer:
             maxEval = -inf
-            for coup in self.coup_disponible():
+            for coup in self.coup_disponible(maximizingPlayer+1, position):
                 copy_du_tableau = copy.deepcopy(position)
                 self.simulation(copy_du_tableau,coup)
                 evaluation = self.minimax(depth-1, False, copy_du_tableau)
@@ -67,24 +67,41 @@ class Game:
             return maxEval
         else:
             minEval = +inf
-            for coup in self.coup_disponible():
+            for coup in self.coup_disponible(maximizingPlayer+1, position):
                 copy_du_tableau = copy.deepcopy(position)
                 self.simulation(copy_du_tableau,coup)
                 evaluation = self.minimax(depth-1, True, copy_du_tableau)
                 minEval = min(minEval, evaluation)
             return minEval
 
+    def get_meilleur_coup(self, evaluation_minimax : int, position : list[list[int]], coup: str, depth : int) -> bool:
+        """
+        Fonction récursive qui trouve le meilleur coup avec des appels successifs de minimax
+        """
+        tableau_copie = copy.deepcopy(position)
+        self.simulation(tableau_copie, coup)
+        eval_dans_fn = -inf
+        if depth == 0:
+            eval_dans_fn = self.minimax(0, 0, position)
+            if eval_dans_fn == evaluation_minimax:
+                return True
+            else:
+                False
+        else:
+            self.get_meilleur_coup(evaluation_minimax, position, coup, depth-1)
+
     def simulation(self, position, coup):
         self.play_move(coup, position)
                 
     def ia_joue(self) -> str:
         """"ça fait jouer l'ia grâce à la première meilleure évaluation de par la fonction minimax"""
-        maxizingPlayer = True if self.turn == "White" else False
-        valeur = self.minimax(1, maxizingPlayer, self.actual_game)
-        for coup in self.coup_disponible():
-            valeur_pour_chaque_coup = self.minimax(0, maxizingPlayer, self.actual_game)
-            if valeur_pour_chaque_coup == valeur:
+        maximizingPlayer = True if self.turn == "White" else False
+        for coup in self.coup_disponible(1, self.actual_game):
+            if self.get_meilleur_coup(self.minimax(3,maximizingPlayer,self.actual_game), self.actual_game, coup, 3):
                 return coup
+
+
+
 
     def coup_disponible(self, joueur: int, position : list[list[int]])->list[str]:
 
@@ -103,7 +120,7 @@ class Game:
                             if pion_possible == couleur_ennemi:
                                 coordonnees = self.analyser_direction_pour_coups_possibles(x+dx,y+dy,couleur_ennemi,joueur,dx,dy,position)
                                 if coordonnees is not None:
-                                    en_str = self.coup_inverse[coordonnees[0]] + str(coordonnees[1])
+                                    en_str = self.coup_inverse[coordonnees[0]] + str(coordonnees[1]+1)
                                     coups_possibles.append(en_str)
 
         return coups_possibles
@@ -123,7 +140,6 @@ class Game:
         Returns:
             tuple[int,int]: coordonnées du prochain pion de couleur adptée
         """
-        print(x+dx, y+dy)
         if position[x+dx][y+dy] == 0:
             return (x+dx, y+dy)
         elif position[x+dx][y+dy] == couleur:
@@ -216,7 +232,7 @@ class Game:
             # Demande à l'utilisateur d'entrer un coup
             self.move = input("Veuillez choisir une position pour jouer : \n- ")
             self.play_move(move=self.move, position=self.actual_game)  # Joue le coup choisi
-            print(self.ia_joue())
+            print(f"IA joue : {self.ia_joue()}")
 
     def play_move(self, move: str, position):
         ##Joue un coup donné sur un tableau de jeu donnée
@@ -235,9 +251,9 @@ class Game:
                     self.turn = "Black"
                 self.entre_pions(self.coup[coup[0]], int(coup[1]) - 1, couleur_joueur, couleur_adversaire, self.actual_game)
             else:
-                print("Position Non Valide !")
+                print(f"Position Non Valide ! coup pas inclus dans liste{self.turn}")
         else:
-            print("Position Non Valide !")
+            print(f"Position Non Valide ! WAzaaaaaaa orthographe{self.turn}")
 
 # Dimensions et paramètres du jeu
 
